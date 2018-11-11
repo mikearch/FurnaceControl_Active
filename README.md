@@ -10,4 +10,5 @@ Heating Temperature Control Scheme Based on Average Indoor temp and outdoor temp
 **Hardware Improvements**  
 Mount RTC
 Improve I2C bus and mount rigidly  
-Single power source to Arduino and relay power module
+Single power source to Arduino and relay power module  
+Simplfy wiring and make rigid connections where possible
