@@ -31,7 +31,7 @@ DallasTemperature sensors(&oneWire);   // Passes bus as reference to Dallas Temp
 
 
 //--------------Pin # Variables------------------------------------------------------------------
-  const int furnacePin =6;               // pin controlling relay for furnace 
+  const int furnacePin =6;               // pin controlling relay for furnace
   const int furnaceModePin = 49;           //pin to receive Home or Away signal from Internet Switch
   const int testTempPin = 47;            // pin to receive test mode signal
 //--------------end of Pin Variables--------------------------------------------------------------
@@ -59,7 +59,7 @@ float temp(void);
 //******************************************************************************************************
 
 void setup() {
-    
+
 //-------------General Setup-----------------------------------------------------------------------
   Serial.begin(9600);
   delay(1500);                        // Allow the hardware to sort itself out
@@ -68,30 +68,30 @@ void setup() {
 
 //-------------One Wire Dallas Temp Setup----------------------------------------------------------
  pinMode(ONE_WIRE_BUS, INPUT_PULLUP);
- // Start up the library 
- sensors.begin(); 
+ // Start up the library
+ sensors.begin();
 //------------end ofOne Wire Dallas Temp Setup----------------------------------------------------------
 
 
-//----------LCD Setup------------------------------------------------------------------------------- 
-  lcd.init();                         // initialize the lcd 
+//----------LCD Setup-------------------------------------------------------------------------------
+  lcd.init();                         // initialize the lcd
   lcd.init();                         //2nd init per example sketches
   lcd.backlight();
 
 
-//---------DHT Setup-------------------------------------------------------------------------------  
+//---------DHT Setup-------------------------------------------------------------------------------
   lcd.setCursor(0,2);
   lcd.print("T:");
   lcd.setCursor(11,2);
   lcd.print("H:");
   dht.begin();
 
- 
+
 //---------RTC Setup--------------------------------------------------------------
  setSyncProvider(RTC.get);                  // the function to get the time from the RTC
 
 //---------end of RTC Setup--------------------------------------------------------------
- 
+
 //---------Furnace Control Setup----------------------------------------------------
   pinMode (testTempPin, INPUT);              //initiates pin for testing home/away cycle
   pinMode(furnacePin, OUTPUT);               //initiates pin for furnace relay
@@ -103,10 +103,9 @@ void setup() {
   lcd.print("H Mode:");
   lcd.setCursor(11,3);
   lcd.print("HS:");
-  lcd.setCursor(13,1);                      //Internet ON or OFF label
-  lcd.print("Int ");                        //Prints Label for Internet Satus
+  
 //---------end of Furnace Control Setup--------------------------------------------------------------
- 
+
 }
 
 //******************************************************************************************************
@@ -118,50 +117,50 @@ void setup() {
 
 void loop() {
 
-  
+
   lcd.setCursor(8,1);                      //displays minimum house temp target.
-  lcd.print(HeatOnTemp); 
+  lcd.print(HeatOnTemp);
 
 //-----------------GETS Dallas Temp WP Sensor data------------------------------------
- Serial.print(" Requesting temperatures..."); 
- sensors.requestTemperatures(); // Send the command to get temperature readings 
- Serial.println("DONE"); 
+ Serial.print(" Requesting temperatures...");
+ sensors.requestTemperatures(); // Send the command to get temperature readings
+ Serial.println("DONE");
 
- 
-//-----------------GETS AND DIPLAYS CURRENT TIME AND DATE------------------------------  
 
-  
+//-----------------GETS AND DIPLAYS CURRENT TIME AND DATE------------------------------
+
+
   tmElements_t tm;                        //Reads RTC
-    
+
   if (RTC.read(tm)) {
       lcd.setCursor(15,0);
-      if ((tm.Hour)<10) 
+      if ((tm.Hour)<10)
          {
-              lcd.print("0");  
+              lcd.print("0");
          }
       lcd.print(tm.Hour);
       lcd.print(":");
-      
-      if ((tm.Minute)<10) 
+
+      if ((tm.Minute)<10)
          {
               lcd.print("0");
          }
       lcd.print(tm.Minute);
       lcd.setCursor(0,0);
-      lcd.print(tm.Day); 
+      lcd.print(tm.Day);
       lcd.print("/");
       lcd.print(tm.Month);
       lcd.print("/");
-      lcd.print(tmYearToCalendar(tm.Year));  
-    } 
-    
+      lcd.print(tmYearToCalendar(tm.Year));
+    }
+
     else {
       lcd.setCursor(0,0);
-      if (RTC.chipPresent()) 
+      if (RTC.chipPresent())
         {
               lcd.print("Run the SetTime");
-        } 
-      else 
+        }
+      else
         {
               lcd.print("Chk Circuits");
         }
@@ -171,7 +170,7 @@ void loop() {
 //------------------Test Implimentation Routine----------------------------
 if (digitalRead (testTempPin) == HIGH) {     // If pin is high, wp sensor is used for sample (put in icewater)
  T =  (sensors.getTempCByIndex(0)-wp_temp_sensor_adj);
- Serial.print("WP Sensor Temperature is: "); 
+ Serial.print("WP Sensor Temperature is: ");
  Serial.print (T);
  delay (2000);
 }
@@ -180,24 +179,24 @@ if (digitalRead (testTempPin) == LOW) {      // If pin is high, DHT sensor is us
  T = temp();                                  //calls temperature reading and display function
 }
 //------------------end of Test Implimentation Routine----------------------------
-                              
+
 //---Furnace Control----------------------------------------------------------------------
-      
+
    if (digitalRead(furnaceModePin) == LOW) {      //Checks if power from remote switch is OFF (LOW) (HOME)
-      
+
       digitalWrite(furnacePin, HIGH);    //Turns Furnace continuously ON by keeping relay low
       lcd.setCursor(8,3);
-      lcd.print("H"); 
+      lcd.print("H");
    }
-     
+
    if (digitalRead(furnaceModePin) == HIGH){         //Controls furnace to maintain minimum temperature
       lcd.setCursor(8,3);
       lcd.print("A");
-       
+
       if (T < HeatOnTemp){                          //If less than target T, pass control to function that turns furn
           FurnaceControl();
       }
-      
+
       if (HoldFurnace == HIGH){                     // If furnace is in HOLD mode (minimum 2hr run time) pass control to function
           FurnaceControl();
       }
@@ -207,16 +206,13 @@ if (digitalRead (testTempPin) == LOW) {      // If pin is high, DHT sensor is us
           digitalWrite(furnacePin, LOW);
           }
       }
-        
-        
+
+
    }
-  
-   
+
+
    lcd.setCursor(15,3);
-   lcd.print(HoldFurnace); 
+   lcd.print(HoldFurnace);
 }
 
 //------------END OF VOID LOOP--------------
-
-
-
