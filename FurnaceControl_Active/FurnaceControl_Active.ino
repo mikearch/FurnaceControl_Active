@@ -65,46 +65,27 @@ void setup() {
   delay(1500);                        // Allow the hardware to sort itself out
 //-------------end of General Setup----------------------------------------------------------------
 
-
 //-------------One Wire Dallas Temp Setup----------------------------------------------------------
  pinMode(ONE_WIRE_BUS, INPUT_PULLUP);
- // Start up the library
- sensors.begin();
+ sensors.begin();   // Start up the library
 //------------end ofOne Wire Dallas Temp Setup----------------------------------------------------------
-
 
 //----------LCD Setup-------------------------------------------------------------------------------
   lcd.init();                         // initialize the lcd
   lcd.init();                         //2nd init per example sketches
   lcd.backlight();
 
-
 //---------DHT Setup-------------------------------------------------------------------------------
-  lcd.setCursor(0,2);
-  lcd.print("T:");
-  lcd.setCursor(11,2);
-  lcd.print("H:");
   dht.begin();
-
 
 //---------RTC Setup--------------------------------------------------------------
  setSyncProvider(RTC.get);                  // the function to get the time from the RTC
-
 //---------end of RTC Setup--------------------------------------------------------------
 
 //---------Furnace Control Setup----------------------------------------------------
   pinMode (testTempPin, INPUT);              //initiates pin for testing home/away cycle
   pinMode(furnacePin, OUTPUT);               //initiates pin for furnace relay
   pinMode(furnaceModePin, INPUT);            //sets furnace mode pin to INPUT
-  //digitalWrite(furnacePin, HIGH);            //turns furnace on HOME by default at startup--note relay wired Normally Closed
-  lcd.setCursor(0,1);
-  lcd.print("M.Tmp.: ");
-  lcd.setCursor(0,3);                        //Heating Mode Label
-  lcd.print("H Mode:");
-  lcd.setCursor(11,3);
-  lcd.print("HS:");
-  
-//---------end of Furnace Control Setup--------------------------------------------------------------
 
 }
 
@@ -127,45 +108,7 @@ void loop() {
  Serial.println("DONE");
 
 
-//-----------------GETS AND DIPLAYS CURRENT TIME AND DATE------------------------------
-
-
-  tmElements_t tm;                        //Reads RTC
-
-  if (RTC.read(tm)) {
-      lcd.setCursor(15,0);
-      if ((tm.Hour)<10)
-         {
-              lcd.print("0");
-         }
-      lcd.print(tm.Hour);
-      lcd.print(":");
-
-      if ((tm.Minute)<10)
-         {
-              lcd.print("0");
-         }
-      lcd.print(tm.Minute);
-      lcd.setCursor(0,0);
-      lcd.print(tm.Day);
-      lcd.print("/");
-      lcd.print(tm.Month);
-      lcd.print("/");
-      lcd.print(tmYearToCalendar(tm.Year));
-    }
-
-    else {
-      lcd.setCursor(0,0);
-      if (RTC.chipPresent())
-        {
-              lcd.print("Run the SetTime");
-        }
-      else
-        {
-              lcd.print("Chk Circuits");
-        }
-      }
-//------------------End of Time and Date Routine----------------------------
+Time_Date(); //Gets and Displays current time and date
 
 //------------------Test Implimentation Routine----------------------------
 if (digitalRead (testTempPin) == HIGH) {     // If pin is high, wp sensor is used for sample (put in icewater)
@@ -184,7 +127,7 @@ if (digitalRead (testTempPin) == LOW) {      // If pin is high, DHT sensor is us
 
    if (digitalRead(furnaceModePin) == LOW) {      //Checks if power from remote switch is OFF (LOW) (HOME)
 
-      digitalWrite(furnacePin, HIGH);    //Turns Furnace continuously ON by keeping relay low
+      digitalWrite(furnacePin, HIGH);             //Turns Furnace continuously ON by keeping relay low
       lcd.setCursor(8,3);
       lcd.print("H");
    }
@@ -206,10 +149,7 @@ if (digitalRead (testTempPin) == LOW) {      // If pin is high, DHT sensor is us
           digitalWrite(furnacePin, LOW);
           }
       }
-
-
    }
-
 
    lcd.setCursor(15,3);
    lcd.print(HoldFurnace);
