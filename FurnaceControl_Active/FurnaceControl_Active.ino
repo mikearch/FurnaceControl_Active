@@ -50,6 +50,32 @@ DallasTemperature sensors(&oneWire);   // Passes bus as reference to Dallas Temp
   unsigned long FurnaceTimeRemaining = 0;  //the amount of seconds remaining from current time to furnace off for Heating Delay
 //-------------end of Heating Variables-----------------------------------------------------------
 
+//******************PubSub*********************************************
+//***********Defines lengths of arrays********************************
+// change when new pubsub data added
+const int arraySize_boolean = 1;
+const int arraySize_float = 2;
+const int arraySize_longUsInt = 2;
+
+//************Defines arrays for pubsub*********************************
+float arrayFloat[arraySize_float] = {20.3, 21.7};
+boolean arrayBoolean[arraySize_boolean] = {false};
+unsigned long arrayLongUs[arraySize_longUsInt] = {7200, 5600};
+
+//************Array identifier Variables*********************************
+String arrayFloatVars ="f";
+String arrayBoolVars ="b";
+String arrayLongUSVars ="l";
+
+//************Transmit Variables******************************************
+String begOfLine = "<";
+String endOfLine = ">";
+String delim =",";
+
+int n = 0;     //initializes array print counter
+//********************End of PubSub******************************************
+
+
 float temp(void);
 
 
@@ -153,6 +179,12 @@ if (digitalRead (testTempPin) == LOW) {      // If pin is high, DHT sensor is us
 
    lcd.setCursor(15,3);
    lcd.print(HoldFurnace);
+
+   Need Timer
+  collectData();    //Loads latest data into arrays
+  printFloat();    //Float array variable transmision
+  printBoolean();  //Boolean array variable transmision
+  printLongUsInt();  //Unsigned Long array variable transmision
 }
 
 //------------END OF VOID LOOP--------------
