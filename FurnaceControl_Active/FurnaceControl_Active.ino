@@ -48,67 +48,70 @@ DallasTemperature sensors(&oneWire);   // Passes bus as reference to Dallas Temp
   //unsigned long HeatingOffDelay = 60;    //furnace runs for 2hrs (7200 seconds) past satisfaction of minimum temp
   int HoldFurnace = 0;                    //allows mainbody to test if Furnace is running within the HeatingDelay time
   unsigned long FurnaceTimeRemaining = 0;  //the amount of seconds remaining from current time to furnace off for Heating Delay
-//-------------end of Heating Variables-----------------------------------------------------------
+//-------------end of Heating Variables-----------------------------------------
 
-//******************PubSub*********************************************
-//***********Defines lengths of arrays********************************
+//******************PubSub******************************************************
+//***********Defines lengths of arrays******************************************
 // change when new pubsub data added
-const int arraySize_boolean = 1;
-const int arraySize_float = 2;
-const int arraySize_longUsInt = 2;
+  const int arraySize_boolean = 1;
+  const int arraySize_float = 2;
+  const int arraySize_longUsInt = 2;
 
-//************Defines arrays for pubsub*********************************
-float arrayFloat[arraySize_float] = {20.3, 21.7};
-boolean arrayBoolean[arraySize_boolean] = {false};
-unsigned long arrayLongUs[arraySize_longUsInt] = {7200, 5600};
+//************Defines arrays for pubsub*****************************************
+  float arrayFloat[arraySize_float] = {20.3, 21.7};
+  boolean arrayBoolean[arraySize_boolean] = {false};
+  unsigned long arrayLongUs[arraySize_longUsInt] = {7200, 5600};
 
-//************Array identifier Variables*********************************
-String arrayFloatVars ="f";
-String arrayBoolVars ="b";
-String arrayLongUSVars ="l";
+//************Array identifier Variables****************************************
+  String arrayFloatVars ="f";
+  String arrayBoolVars ="b";
+  String arrayLongUSVars ="l";
 
-//************Transmit Variables******************************************
-String begOfLine = "<";
-String endOfLine = ">";
-String delim =",";
+//************Transmit Variables************************************************
+  String begOfLine = "<";
+  String endOfLine = ">";
+  String delim =",";
 
-int n = 0;     //initializes array print counter
-//********************End of PubSub******************************************
+  unsigned long oldMillis = millis();     //used for timer to limit serial transmission
+  unsigned long currMillis = 0;
+  unsigned long transmitInterval = 60000;  //Interval for transmitting serial data
+  int n = 0;     //initializes array print counter
+//********************End of PubSub*********************************************
 
 
 float temp(void);
 
 
 
-//******************************************************************************************************
-//**********************Setup********************************************************************
-//******************************************************************************************************
+//******************************************************************************
+//**********************Setup***************************************************
+//******************************************************************************
 
 void setup() {
 
-//-------------General Setup-----------------------------------------------------------------------
+//-------------General Setup----------------------------------------------------
   Serial.begin(9600);
   delay(1500);                        // Allow the hardware to sort itself out
-//-------------end of General Setup----------------------------------------------------------------
+//-------------end of General Setup---------------------------------------------
 
-//-------------One Wire Dallas Temp Setup----------------------------------------------------------
+//-------------One Wire Dallas Temp Setup---------------------------------------
  pinMode(ONE_WIRE_BUS, INPUT_PULLUP);
  sensors.begin();   // Start up the library
-//------------end ofOne Wire Dallas Temp Setup----------------------------------------------------------
+//------------end ofOne Wire Dallas Temp Setup----------------------------------
 
-//----------LCD Setup-------------------------------------------------------------------------------
+//----------LCD Setup-----------------------------------------------------------
   lcd.init();                         // initialize the lcd
   lcd.init();                         //2nd init per example sketches
   lcd.backlight();
 
-//---------DHT Setup-------------------------------------------------------------------------------
+//---------DHT Setup------------------------------------------------------------
   dht.begin();
 
-//---------RTC Setup--------------------------------------------------------------
+//---------RTC Setup------------------------------------------------------------
  setSyncProvider(RTC.get);                  // the function to get the time from the RTC
-//---------end of RTC Setup--------------------------------------------------------------
+//---------end of RTC Setup-----------------------------------------------------
 
-//---------Furnace Control Setup----------------------------------------------------
+//---------Furnace Control Setup------------------------------------------------
   pinMode (testTempPin, INPUT);              //initiates pin for testing home/away cycle
   pinMode(furnacePin, OUTPUT);               //initiates pin for furnace relay
   pinMode(furnaceModePin, INPUT);            //sets furnace mode pin to INPUT
@@ -120,36 +123,33 @@ void setup() {
 //******************************************************************************************************
 
 
-
-
 void loop() {
 
+  Time_Date(); //Gets and Displays current time and date
 
   lcd.setCursor(8,1);                      //displays minimum house temp target.
   lcd.print(HeatOnTemp);
 
-//-----------------GETS Dallas Temp WP Sensor data------------------------------------
- Serial.print(" Requesting temperatures...");
- sensors.requestTemperatures(); // Send the command to get temperature readings
- Serial.println("DONE");
+//-----------------GETS Dallas Temp WP Sensor data------------------------------
+  Serial.print(" Requesting temperatures...");
+  sensors.requestTemperatures(); // Send the command to get temperature readings
+  Serial.println("DONE");
 
 
-Time_Date(); //Gets and Displays current time and date
+//------------------Test Implimentation Routine---------------------------------
+  if (digitalRead (testTempPin) == HIGH) {     // If pin is high, wp sensor is used for sample (put in icewater)
+    T =  (sensors.getTempCByIndex(0)-wp_temp_sensor_adj);
+    Serial.print("WP Sensor Temperature is: ");
+    Serial.print (T);
+    delay (2000);
+  }
 
-//------------------Test Implimentation Routine----------------------------
-if (digitalRead (testTempPin) == HIGH) {     // If pin is high, wp sensor is used for sample (put in icewater)
- T =  (sensors.getTempCByIndex(0)-wp_temp_sensor_adj);
- Serial.print("WP Sensor Temperature is: ");
- Serial.print (T);
- delay (2000);
-}
+  if (digitalRead (testTempPin) == LOW) {      // If pin is high, DHT sensor is used for sample (in air)
+    T = temp();                                  //calls temperature reading and display function
+  }
+//------------------end of Test Implimentation Routine--------------------------
 
-if (digitalRead (testTempPin) == LOW) {      // If pin is high, DHT sensor is used for sample (in air)
- T = temp();                                  //calls temperature reading and display function
-}
-//------------------end of Test Implimentation Routine----------------------------
-
-//---Furnace Control----------------------------------------------------------------------
+//------------------Furnace Control---------------------------------------------
 
    if (digitalRead(furnaceModePin) == LOW) {      //Checks if power from remote switch is OFF (LOW) (HOME)
 
@@ -180,11 +180,16 @@ if (digitalRead (testTempPin) == LOW) {      // If pin is high, DHT sensor is us
    lcd.setCursor(15,3);
    lcd.print(HoldFurnace);
 
-   Need Timer
-  collectData();    //Loads latest data into arrays
-  printFloat();    //Float array variable transmision
-  printBoolean();  //Boolean array variable transmision
-  printLongUsInt();  //Unsigned Long array variable transmision
-}
+//-------------Timer for Serial Comm. routines---------------------
+   currMillis = millis();
 
-//------------END OF VOID LOOP--------------
+  if((currMillis - oldMillis) >= transmitInterval){
+    collectData();    //Loads latest data into arrays
+    printFloat();    //Float array variable transmision
+    printBoolean();  //Boolean array variable transmision
+    printLongUsInt();  //Unsigned Long array variable transmision
+    oldMillis = currMillis
+  }
+//-------------End of Timer for Serial Comm. routines---------------------
+}
+//*******************END OF VOID LOOP***************************************
