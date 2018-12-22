@@ -60,7 +60,7 @@ void collectData(){
   //Boolean array
   arrayBoolean[0] = furnaceModePin;
   //Float array
-  arrayFloat[0] = t;
+  arrayFloat[0] = T;
   arrayFloat[1] = HeatOnTemp;
   //Long UnsInt array
   arrayLongUs[0] = HeatingOffDelay;

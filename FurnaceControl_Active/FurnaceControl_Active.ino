@@ -188,7 +188,7 @@ void loop() {
     printFloat();    //Float array variable transmision
     printBoolean();  //Boolean array variable transmision
     printLongUsInt();  //Unsigned Long array variable transmision
-    oldMillis = currMillis
+    oldMillis = currMillis;
   }
 //-------------End of Timer for Serial Comm. routines---------------------
 }
