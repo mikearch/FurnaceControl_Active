@@ -91,6 +91,7 @@ void setup() {
 
 //-------------General Setup----------------------------------------------------
   Serial.begin(9600);
+  Serial1.begin(9600);
   delay(1500);                        // Allow the hardware to sort itself out
 //-------------end of General Setup---------------------------------------------
 
@@ -103,7 +104,7 @@ void setup() {
   lcd.init();                         // initialize the lcd
   lcd.init();                         //2nd init per example sketches
   lcd.backlight();
-
+  LCD_Label_Print();
 //---------DHT Setup------------------------------------------------------------
   dht.begin();
 
