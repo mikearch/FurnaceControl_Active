@@ -43,9 +43,9 @@ DallasTemperature sensors(&oneWire);   // Passes bus as reference to Dallas Temp
   unsigned long FurnaceOnTime;            //time that the furnace was turned on
   unsigned long FurnaceRunningTime;        //length of time in seconds that the furnance has been on
   int furnaceStatus = LOW;                //sets status variable to LOW (furnance On)
-  float HeatOnTemp = 10;                  //minimum temperature allowed when system is set to AWAY
-  unsigned long HeatingOffDelay = 7200;    //furnace runs for 2hrs (7200 seconds) past satisfaction of minimum temp
-  //unsigned long HeatingOffDelay = 60;    //furnace runs for 2hrs (7200 seconds) past satisfaction of minimum temp
+  float HeatOnTemp = 8;                  //minimum temperature allowed when system is set to AWAY
+  unsigned long HeatingOffDelay = 2700;    //furnace runs for 45 mins (2700 seconds) past satisfaction of minimum temp
+  //unsigned long HeatingOffDelay = 60;    //furnace runs for 1 min (60 seconds) past satisfaction of minimum temp
   int HoldFurnace = 0;                    //allows mainbody to test if Furnace is running within the HeatingDelay time
   unsigned long FurnaceTimeRemaining = 0;  //the amount of seconds remaining from current time to furnace off for Heating Delay
 //-------------end of Heating Variables-----------------------------------------------------------
@@ -103,7 +103,7 @@ void setup() {
   lcd.print("H Mode:");
   lcd.setCursor(11,3);
   lcd.print("HS:");
-  
+
 //---------end of Furnace Control Setup--------------------------------------------------------------
 
 }

@@ -7,28 +7,28 @@ float temp(){
   */
   delay(2000);
 
-  
+
   float h = dht.readHumidity();
   float t = dht.readTemperature()-dht_temp_sensor_adj;             // Read temperature as Celsius (the default)
   float f = dht.readTemperature(true)-(dht_temp_sensor_adj*9/5);    // Read temperature as Fahrenheit (isFahrenheit = true)
- 
+
   if (isnan(h) || isnan(t) || isnan(f)) {           // Check if any reads failed and exit early (to try again).
     Serial.println("Failed to read from DHT sensor!");
-    return;
+    return -99.0;
   }
 
-  
+
   Serial.print("Humidity: ");
   Serial.print(h);
   Serial.print(" %\t");
   Serial.print("Temp: ");
   Serial.print(t);
   Serial.print(" *C ");
- 
+
 
  //----------------END OF TEMPERATURE CALCULATION
 
- //----------------DISPLAYS TEMPERATURE 
+ //----------------DISPLAYS TEMPERATURE
   lcd.setCursor(3,2);
   lcd.print(t);
   lcd.print("C");
