@@ -58,7 +58,7 @@ void printLongUsInt(){
 //This function needs to have one line for each position in the above three arrays
 void collectData(){
   //Boolean array
-  arrayBoolean[0] = furnaceModePin;
+  arrayBoolean[0] = digitalRead(furnaceModePin);
   //Float array
   arrayFloat[0] = T;
   arrayFloat[1] = HeatOnTemp;
