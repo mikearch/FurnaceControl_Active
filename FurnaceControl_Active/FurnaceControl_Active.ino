@@ -32,8 +32,9 @@ DallasTemperature sensors(&oneWire);   // Passes bus as reference to Dallas Temp
 
 //--------------Pin # Variables------------------------------------------------------------------
   const int furnacePin =6;               // pin controlling relay for furnace
-  const int furnaceModePin = 49;           //pin to receive Home or Away signal from Internet Switch
+  const int furnaceModePin = 49;          //pin to receive Home or Away signal from Internet Switch
   const int testTempPin = 47;            // pin to receive test mode signal
+  const int pumpPin =5;                  // pin controlling relay for irrigation pump
 //--------------end of Pin Variables--------------------------------------------------------------
 
 
@@ -49,7 +50,20 @@ DallasTemperature sensors(&oneWire);   // Passes bus as reference to Dallas Temp
   int HoldFurnace = 0;                    //allows mainbody to test if Furnace is running within the HeatingDelay time
   unsigned long FurnaceTimeRemaining = 0;  //the amount of seconds remaining from current time to furnace off for Heating Delay
 //-------------end of Heating Variables-----------------------------------------------------------
-
+//-------------Pump Variables------------------------------------------------------------------------
+unsigned long Basetime;                //variable for time of current bootup
+unsigned long CurtimePump;             //time of pump at snapshot
+unsigned long PumpOnTime;              //Target time for turning on pump
+unsigned long ActPumpOnTime;           //Actual time when the pump was turned on
+unsigned long PumpRunningTime;         //Length in seconds that pumpPin has been LOW
+unsigned long Timediff;                //seconds remaining until PumpOnTime
+unsigned long PumpInterval = 86400;    //One day cycle for pump time
+//unsigned long PumpInterval = 200;    //for testing purposes only should be commented out
+unsigned long StartOfDayTime;          //midnight(start of day) of current day
+unsigned long PumpOnHour = 28800;      //Seconds from midnight to 8:00AM
+//unsigned long PumpOnHour = 66720;    //Seconds from midnight to test time.should be commented out
+int pumpStatus = HIGH;
+//------------- end of Pump Variables------------------------------------------------------------------------
 float temp(void);
 
 
@@ -105,6 +119,18 @@ void setup() {
   lcd.print("HS:");
 
 //---------end of Furnace Control Setup--------------------------------------------------------------
+
+//----------Pump Control Setup---------------------------------------------------------
+  StartOfDayTime = daystart();              //Gets the UNIX time for midnight of current day
+  Basetime = RTC.get();                     //gets current time in seconds when system has started
+  PumpOnTime = StartOfDayTime + PumpOnHour; //sets initial pump operation for current time plus interval
+    if (Basetime > PumpOnTime) {              //checks to see if the day's pump has been missed
+      PumpOnTime = PumpOnTime + PumpInterval; //if missed set it for the next pump on time
+    }
+  pinMode(pumpPin, OUTPUT);                 //initiates pin for pump relay
+  pinMode(pumpOff, INPUT);
+  digitalWrite(pumpPin,HIGH);               //sets pin to release relay
+  digitalWrite (pumpOff, HIGH);             //sets up pin for pump on-off button
 
 }
 
@@ -180,6 +206,8 @@ if (digitalRead (testTempPin) == LOW) {      // If pin is high, DHT sensor is us
 }
 //------------------end of Test Implimentation Routine----------------------------
 
+//---Pump Control-------------------------------------------------------------------------
+PumpControl();                        //calls function to control pump
 //---Furnace Control----------------------------------------------------------------------
 
    if (digitalRead(furnaceModePin) == LOW) {      //Checks if power from remote switch is OFF (LOW) (HOME)
