@@ -128,9 +128,9 @@ void setup() {
       PumpOnTime = PumpOnTime + PumpInterval; //if missed set it for the next pump on time
     }
   pinMode(pumpPin, OUTPUT);                 //initiates pin for pump relay
-  pinMode(pumpOff, INPUT);
+  //pinMode(pumpOff, INPUT);                //error in compiling
   digitalWrite(pumpPin,HIGH);               //sets pin to release relay
-  digitalWrite (pumpOff, HIGH);             //sets up pin for pump on-off button
+  //digitalWrite (pumpOff, HIGH);             //sets up pin for pump on-off button error in compliling
 
 }
 
