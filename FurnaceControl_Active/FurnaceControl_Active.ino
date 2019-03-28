@@ -63,6 +63,7 @@ unsigned long StartOfDayTime;          //midnight(start of day) of current day
 unsigned long PumpOnHour = 28800;      //Seconds from midnight to 8:00AM
 //unsigned long PumpOnHour = 66720;    //Seconds from midnight to test time.should be commented out
 int pumpStatus = HIGH;
+int maxPumpRun = 300;                  //Seconds that pump is able to run each fill cycle
 //------------- end of Pump Variables------------------------------------------------------------------------
 float temp(void);
 

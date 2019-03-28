@@ -23,7 +23,7 @@ void PumpControl() {
 if (pumpStatus == LOW) {                          //Checks if pump is ON
 
   PumpRunningTime = CurtimePump - ActPumpOnTime;  //If pump in ON, update running time
-  if (PumpRunningTime > 120) {                    //Check if pump has run for target time and turn off is yes
+  if (PumpRunningTime > maxPumpRun) {             //Check if pump has run for target time and turn off is yes
     digitalWrite(pumpPin, HIGH);                  //Turns pump off
     PumpRunningTime =0;                           //Clear the pump running time after turning pump off
   }
