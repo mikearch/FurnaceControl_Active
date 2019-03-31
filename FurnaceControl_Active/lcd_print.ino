@@ -25,5 +25,8 @@ void lcddata(){
 //----prints hold status of AWAY mode
   lcd.setCursor(15,3);
   lcd.print(HoldFurnace);
+//----prints home or away status
+  lcd.setCursor(8,3);
+  lcd.print(HeatingMode);
   return;
 }

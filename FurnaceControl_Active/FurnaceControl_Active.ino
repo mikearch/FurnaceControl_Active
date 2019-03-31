@@ -39,7 +39,8 @@ DallasTemperature sensors(&oneWire);   // Passes bus as reference to Dallas Temp
 
 
 //--------------Heating Variables-----------------------------------------------------------------
-  int HeatingMode = 1;                    //Mode of Heating system 0 = Away, 1= Home
+
+  String HeatingMode = "Z";               //Mode of Heating system 0 = Away, 1= Home
   unsigned long CurtimeFurnace;           //time of furnace at execution of furnace control function
   unsigned long FurnaceOnTime;            //time that the furnace was turned on
   unsigned long FurnaceRunningTime;        //length of time in seconds that the furnance has been on
@@ -201,15 +202,12 @@ PumpControl();                        //calls function to control pump
 //---Furnace Control----------------------------------------------------------------------
 
    if (digitalRead(furnaceModePin) == LOW) {      //Checks if power from remote switch is OFF (LOW) (HOME)
-
       digitalWrite(furnacePin, HIGH);    //Turns Furnace continuously ON by keeping relay low
-      lcd.setCursor(8,3);
-      lcd.print("H");
+      HeatingMode = "H";
    }
 
    if (digitalRead(furnaceModePin) == HIGH){         //Controls furnace to maintain minimum temperature
-      lcd.setCursor(8,3);
-      lcd.print("A");
+      HeatingMode = "A";
 
       if (T < HeatOnTemp){                          //If less than target T, pass control to function that turns furn
           FurnaceControl();
