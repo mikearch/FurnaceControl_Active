@@ -95,12 +95,8 @@ void setup() {
 
 
 //---------DHT Setup-------------------------------------------------------------------------------
-  lcd.setCursor(0,2);
-  lcd.print("T:");
-  lcd.setCursor(11,2);
-  lcd.print("H:");
-  dht.begin();
 
+  dht.begin();
 
 //---------RTC Setup--------------------------------------------------------------
  setSyncProvider(RTC.get);                  // the function to get the time from the RTC
@@ -112,12 +108,6 @@ void setup() {
   pinMode(furnacePin, OUTPUT);               //initiates pin for furnace relay
   pinMode(furnaceModePin, INPUT);            //sets furnace mode pin to INPUT
   //digitalWrite(furnacePin, HIGH);            //turns furnace on HOME by default at startup--note relay wired Normally Closed
-  lcd.setCursor(0,1);
-  lcd.print("M.Tmp.: ");
-  lcd.setCursor(0,3);                        //Heating Mode Label
-  lcd.print("H Mode:");
-  lcd.setCursor(11,3);
-  lcd.print("HS:");
 
 //---------end of Furnace Control Setup--------------------------------------------------------------
 
@@ -133,6 +123,8 @@ void setup() {
   digitalWrite(pumpPin,HIGH);               //sets pin to release relay
   //digitalWrite (pumpOff, HIGH);             //sets up pin for pump on-off button error in compliling
 
+
+  lcdlabels();                              //prints labels for data to LCD
 }
 
 //******************************************************************************************************
@@ -144,9 +136,6 @@ void setup() {
 
 void loop() {
 
-
-  lcd.setCursor(8,1);                      //displays minimum house temp target.
-  lcd.print(HeatOnTemp);
 
 //-----------------GETS Dallas Temp WP Sensor data------------------------------------
  Serial.print(" Requesting temperatures...");
@@ -235,13 +224,9 @@ PumpControl();                        //calls function to control pump
           digitalWrite(furnacePin, LOW);
           }
       }
-
-
    }
 
-
-   lcd.setCursor(15,3);
-   lcd.print(HoldFurnace);
+   lcddata();                                       //prints data to LCD
 }
 
 //------------END OF VOID LOOP--------------
