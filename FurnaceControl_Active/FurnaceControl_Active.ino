@@ -8,6 +8,7 @@
 #include "DHT.h"                       //For DHT22 Temp sensor
 #include <OneWire.h>                   //For waterproof temp sensor
 #include <DallasTemperature.h>         //For waterproof temp sensor
+#include <AM2320.h>                    //for AM2320B Temp sensor
 //--------------end of Libraries-------------------------------------
 
 #define DHTPIN 2                       // digital pin for temperature data DHT22
@@ -15,10 +16,20 @@
 #define ONE_WIRE_BUS 45                // defines which pin the onewire bus operates on
 
 //--------------Initiate Instances-----------------------------------
-DHT dht(DHTPIN, DHTTYPE);
-LiquidCrystal_I2C lcd(0x27,20,4);      // set the LCD address to 0x27 for a 20 chars and 4 line display
-OneWire oneWire(ONE_WIRE_BUS);         // Initiates one wire bus for all devices
-DallasTemperature sensors(&oneWire);   // Passes bus as reference to Dallas Temp
+//int tempSensType = 1;                // enable if sensor is DHT 22
+int tempSensType = 2;                  // enable if sensor is AM2320B
+
+if(tempSensType) == 1 {
+  DHT dht(DHTPIN, DHTTYPE);
+}
+
+if tempSensType == 2 {
+  AM2320 th;                            //Initializes AM2320B sensor instance
+}
+
+LiquidCrystal_I2C lcd(0x27,20,4);       // set the LCD address to 0x27 for a 20 chars and 4 line display
+OneWire oneWire(ONE_WIRE_BUS);          // Initiates one wire bus for all devices
+DallasTemperature sensors(&oneWire);    // Passes bus as reference to Dallas Temp
 //--------------end of Instantiation---------------------------------
 
 
@@ -32,7 +43,7 @@ DallasTemperature sensors(&oneWire);   // Passes bus as reference to Dallas Temp
 
 //--------------Pin # Variables------------------------------------------------------------------
   const int furnacePin =6;               // pin controlling relay for furnace
-  const int furnaceModePin = 49;          //pin to receive Home or Away signal from Internet Switch
+  const int furnaceModePin = 49;         //pin to receive Home or Away signal from Internet Switch
   const int testTempPin = 47;            // pin to receive test mode signal
   const int pumpPin =5;                  // pin controlling relay for irrigation pump
 //--------------end of Pin Variables--------------------------------------------------------------
@@ -43,13 +54,13 @@ DallasTemperature sensors(&oneWire);   // Passes bus as reference to Dallas Temp
   String HeatingMode = "Z";               //Mode of Heating system 0 = Away, 1= Home
   unsigned long CurtimeFurnace;           //time of furnace at execution of furnace control function
   unsigned long FurnaceOnTime;            //time that the furnace was turned on
-  unsigned long FurnaceRunningTime;        //length of time in seconds that the furnance has been on
+  unsigned long FurnaceRunningTime;       //length of time in seconds that the furnance has been on
   int furnaceStatus = LOW;                //sets status variable to LOW (furnance On)
-  float HeatOnTemp = 6;                  //minimum temperature allowed when system is set to AWAY
-  unsigned long HeatingOffDelay = 2700;    //furnace runs for 45 mins (2700 seconds) past satisfaction of minimum temp
-  //unsigned long HeatingOffDelay = 60;    //furnace runs for 1 min (60 seconds) past satisfaction of minimum temp
+  float HeatOnTemp = 6;                   //minimum temperature allowed when system is set to AWAY
+  unsigned long HeatingOffDelay = 2700;   //furnace runs for 45 mins (2700 seconds) past satisfaction of minimum temp
+  //unsigned long HeatingOffDelay = 60;   //furnace runs for 1 min (60 seconds) past satisfaction of minimum temp
   int HoldFurnace = 0;                    //allows mainbody to test if Furnace is running within the HeatingDelay time
-  unsigned long FurnaceTimeRemaining = 0;  //the amount of seconds remaining from current time to furnace off for Heating Delay
+  unsigned long FurnaceTimeRemaining = 0; //the amount of seconds remaining from current time to furnace off for Heating Delay
 //-------------end of Heating Variables-----------------------------------------------------------
 //-------------Pump Variables------------------------------------------------------------------------
 unsigned long Basetime;                //variable for time of current bootup
